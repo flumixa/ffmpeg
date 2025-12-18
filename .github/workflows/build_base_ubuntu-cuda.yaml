@@ -67,5 +67,5 @@ jobs:
           platforms: ${{ matrix.platforms }}
           push: true
           tags: |
-            datarhei/base:ubuntu-ffmpeg-cuda-${{ env.OS_VERSION }}-${{ env.FFMPEG_VERSION }}-${{ env.CUDA_VERSION }}
-            datarhei/base:ffmpeg${{ env.FFMPEG_VERSION }}-cuda-ubuntu${{ env.OS_VERSION }}-cuda${{ env.CUDA_VERSION }}
+            sharapov/flumixa-base:ubuntu-ffmpeg-cuda-${{ env.OS_VERSION }}-${{ env.FFMPEG_VERSION }}-${{ env.CUDA_VERSION }}
+            sharapov/flumixa-base:ffmpeg${{ env.FFMPEG_VERSION }}-cuda-ubuntu${{ env.OS_VERSION }}-cuda${{ env.CUDA_VERSION }}

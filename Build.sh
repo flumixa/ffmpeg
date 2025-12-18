@@ -15,8 +15,8 @@ function build_default_native() {
     --build-arg BUILD_IMAGE=$OS_NAME:$OS_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     -f Dockerfile.alpine \
-    -t datarhei/base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
-  docker tag datarhei/base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} datarhei/base:$OS_NAME-ffmpeg-$OS_VERSION-$FFMPEG_VERSION
+    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-$OS_VERSION-$FFMPEG_VERSION
 }
 
 function build_default() {
@@ -31,9 +31,9 @@ function build_default() {
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     --platform linux/amd64 \
     -f Dockerfile.alpine \
-    -t datarhei/base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
-  docker tag datarhei/base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} datarhei/base:$OS_NAME-ffmpeg-$OS_VERSION-$FFMPEG_VERSION
-  docker tag datarhei/base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} datarhei/base:$OS_NAME-ffmpeg-latest
+    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-$OS_VERSION-$FFMPEG_VERSION
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-latest
 }
 
 function build_rpi() {
@@ -44,9 +44,9 @@ function build_rpi() {
     --build-arg BUILD_IMAGE=$OS_NAME:$OS_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     -f Dockerfile.alpine.rpi \
-    -t datarhei/base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} .
-  docker tag datarhei/base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} datarhei/base:$OS_NAME-ffmpeg-rpi-$OS_VERSION-$FFMPEG_VERSION
-  docker tag datarhei/base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} datarhei/base:$OS_NAME-ffmpeg-rpi-latest
+    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-rpi-$OS_VERSION-$FFMPEG_VERSION
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-rpi-latest
 }
 
 function build_cuda11() {
@@ -58,7 +58,7 @@ function build_cuda11() {
     --build-arg FFNVCODEC_VERSION=$FFNVCODEC_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     -f Dockerfile.ubuntu.cuda11 \
-    -t datarhei/base:ffmpeg${FFMPEG_VERSION}-cuda-ubuntu$OS_VERSION-cuda${CUDA_VERSION} .
+    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-ubuntu$OS_VERSION-cuda${CUDA_VERSION} .
 }
 
 function build_cuda12() {
@@ -70,7 +70,7 @@ function build_cuda12() {
     --build-arg FFNVCODEC_VERSION=$FFNVCODEC_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     -f Dockerfile.ubuntu.cuda12 \
-    -t datarhei/base:ffmpeg${FFMPEG_VERSION}-cuda-ubuntu$OS_VERSION-cuda${CUDA_VERSION} .
+    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-ubuntu$OS_VERSION-cuda${CUDA_VERSION} .
 }
 
 function build_vaapi() {
@@ -84,7 +84,7 @@ function build_vaapi() {
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     --platform linux/amd64 \
     -f Dockerfile.ubuntu.vaapi \
-    -t datarhei/base:ffmpeg${FFMPEG_VERSION}-vaapi-${OS_NAME}${OS_VERSION} .
+    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-vaapi-${OS_NAME}${OS_VERSION} .
 }
 
 main() {

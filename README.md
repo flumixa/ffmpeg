@@ -1,13 +1,13 @@
 # FFmpeg Base
 
-FFmpeg base image for [datarhei/core](https://github.com/datarhei/core).
+FFmpeg base image for [flumixa](https://github.com/flumixa).
 
-[![alpine](https://github.com/datarhei/ffmpeg/actions/workflows/build_base_alpine.yaml/badge.svg)](https://github.com/datarhei/ffmpeg/actions/workflows/build_base_alpine.yaml)
-[![alpine-rpi](https://github.com/datarhei/ffmpeg/actions/workflows/build_base_alpine-rpi.yaml/badge.svg)](https://github.com/datarhei/ffmpeg/actions/workflows/build_base_alpine-rpi.yaml)
-[![base:ubuntu-ffmpeg-vvapi](https://github.com/datarhei/ffmpeg/actions/workflows/build_base_ubuntu-vaapi.yaml/badge.svg)](https://github.com/datarhei/ffmpeg/actions/workflows/build_base_ubuntu-vaapi.yaml)
-[![ubuntu-cuda](https://github.com/datarhei/ffmpeg/actions/workflows/build_base_ubuntu-cuda.yaml/badge.svg)](https://github.com/datarhei/ffmpeg/actions/workflows/build_base_ubuntu-cuda.yaml)
+[![alpine](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_alpine.yaml/badge.svg)](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_alpine.yaml)
+[![alpine-rpi](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_alpine-rpi.yaml/badge.svg)](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_alpine-rpi.yaml)
+[![ubuntu-ffmpeg-vvapi](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_ubuntu-vaapi.yaml/badge.svg)](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_ubuntu-vaapi.yaml)
+[![ubuntu-cuda](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_ubuntu-cuda.yaml/badge.svg)](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_ubuntu-cuda.yaml)
 
-Branch: 6.1
+Branch: 7.0
 
 ## Config:
 
@@ -31,21 +31,21 @@ _Additional informations can be found in the Dockerfiles._
 - JSON-Stats (expands progress data per file in json format)
 - HLS Bitrate (calculates bitrate estimate for HLS master playlist)
 
-## Images and Plattforms:
+## Images and Platforms:
 
-| Dockerimage                                        | OS           | Plattform                                | GPU                                         |
-| -------------------------------------------------- | ------------ | ---------------------------------------- | ------------------------------------------- |
-| docker.io/datarhei/base:alpine-ffmpeg-latest       | Alpine 3.16  | linux/amd64, linux/arm64, linux/arm/v7   | -                                           |
-| docker.io/datarhei/base:alpine-ffmpeg-rpi-latest   | Alpine 3.16  | Raspberry Pi (linux/arm/v7, linux/arm64) | MMAL/OMX/V4L2-M2M (32bit), V4L2-M2M (64bit) |
-| docker.io/datarhei/base:ubuntu-ffmpeg-cuda-latest  | Ubuntu 20.04 | linux/amd64                              | Nvidia Cuda                                 |
-| docker.io/datarhei/base:ubuntu-ffmpeg-vaapi-latest | Ubuntu 20.04 | linux/amd64                              | Intel VAAPI                                 |
+| Dockerimage                                                | OS           | Plattform                                | GPU                                         |
+|------------------------------------------------------------|--------------|------------------------------------------|---------------------------------------------|
+| docker.io/sharapov/flumixa-base:alpine-ffmpeg-latest       | Alpine 3.16  | linux/amd64, linux/arm64, linux/arm/v7   | -                                           |
+| docker.io/sharapov/flumixa-base:alpine-ffmpeg-rpi-latest   | Alpine 3.16  | Raspberry Pi (linux/arm/v7, linux/arm64) | MMAL/OMX/V4L2-M2M (32bit), V4L2-M2M (64bit) |
+| docker.io/sharapov/flumixa-base:ubuntu-ffmpeg-cuda-latest  | Ubuntu 20.04 | linux/amd64                              | Nvidia Cuda                                 |
+| docker.io/sharapov/flumixa-base:ubuntu-ffmpeg-vaapi-latest | Ubuntu 20.04 | linux/amd64                              | Intel VAAPI                                 |
 
-More tags: https://hub.docker.com/repository/docker/datarhei/base/general
+More tags: https://hub.docker.com/repository/docker/sharapov/flumixa-base/general
 
 ## Build & test
 
 ```sh
-$ git clone github.com/datarhei/ffmpeg
+$ git clone github.com/flumixa/ffmpeg
 $ ./Build.sh {arg}
 ```
 

@@ -58,5 +58,5 @@ jobs:
           platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
-            datarhei/base:${{ env.OS_NAME }}-ffmpeg-${{ env.OS_VERSION }}-${{ env.FFMPEG_VERSION }}
-            datarhei/base:ffmpeg${{ env.FFMPEG_VERSION }}-${{ env.OS_NAME }}${{ env.OS_VERSION }}
+            sharapov/flumixa-base:${{ env.OS_NAME }}-ffmpeg-${{ env.OS_VERSION }}-${{ env.FFMPEG_VERSION }}
+            sharapov/flumixa-base:ffmpeg${{ env.FFMPEG_VERSION }}-${{ env.OS_NAME }}${{ env.OS_VERSION }}
