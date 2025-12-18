@@ -1,10 +1,10 @@
 # Filename: Dockerfile.static
 
-FROM alpine:3.15 AS builder
+FROM alpine:3.21 AS builder
 
 ARG BUILD_DATE=1970-01-01T00:00:00Z
 ARG BUILD_COMMIT=unknown
-ARG FFMPEG_VERSION=6.1
+ARG FFMPEG_VERSION=unknown
 
 ENV SRC=/usr \
     PKG_CONFIG_PATH=/usr/lib/pkgconfig \
