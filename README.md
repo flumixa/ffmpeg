@@ -24,7 +24,7 @@ Branch: 7.0
 --enable-libvorbis
 ```
 
-_Additional informations can be found in the Dockerfiles._
+_Additional information can be found in the Dockerfiles._
 
 ## Patches ([contrib](contrib/)):
 
