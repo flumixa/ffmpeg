@@ -8,7 +8,8 @@ on:
 
 jobs:
   docker:
-    runs-on: [self-hosted]
+    runs-on:
+      - ubuntu-latest
     strategy:
       matrix:
         include:
@@ -59,4 +60,4 @@ jobs:
           platforms: ${{ matrix.platforms }}
           push: true
           tags: |
-            datarhei/base:ffmpeg${{ matrix.ffmpeg_version }}-vaapi-${{ matrix.os }}${{ matrix.os_version }}
+            sharapov/flumixa-base:ffmpeg${{ matrix.ffmpeg_version }}-vaapi-${{ matrix.os }}${{ matrix.os_version }}

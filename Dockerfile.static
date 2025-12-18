@@ -34,7 +34,7 @@ RUN cd ffmpeg-${FFMPEG_VERSION} && \
     patch -p1 < /contrib/ffmpeg-jsonstats.patch && \
     patch -p1 < /contrib/ffmpeg-hls.patch && \
     ./configure \
-        --extra-version="datarhei-${BUILD_COMMIT}-${BUILD_DATE}" \
+        --extra-version="flumixa-${BUILD_COMMIT}-${BUILD_DATE}" \
         --prefix="${SRC}" \
         --extra-libs="-lpthread -lxml2 -lm -lsupc++ -lstdc++ -lssl -lcrypto -lz -lc -ldl" \
         --enable-nonfree \
