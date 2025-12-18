@@ -58,7 +58,7 @@ Args:
 
 ## Known problems:
 
-The libraries are currently not compiled due to errors caused by Docker virtualisation.
+The libraries are currently not compiled due to errors caused by Docker virtualization.
 
 ## Feature requests:
 
