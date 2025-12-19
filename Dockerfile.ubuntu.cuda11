@@ -49,9 +49,9 @@ RUN curl --proto '=https' --tlsv1.3 https://sh.rustup.rs -sSf | sh -s -- -y
 
 # install librav1e
 RUN mkdir -p /dist && cd /dist && \
-  curl -OLk https://github.com/xiph/rav1e/archive/refs/tags/v${RAV1E_VERSION}.tar.gz && \
-  tar xfvz v${RAV1E_VERSION}.tar.gz && \
-  rm v${RAV1E_VERSION}.tar.gz && \
+  curl -L -o rav1e-${RAV1E_VERSION}.tar.gz https://github.com/xiph/rav1e/archive/v${RAV1E_VERSION}.tar.gz && \
+  tar xfvz rav1e-${RAV1E_VERSION}.tar.gz && \
+  rm rav1e-${RAV1E_VERSION}.tar.gz && \
   cd rav1e-${RAV1E_VERSION} && \
   /root/.cargo/bin/cargo install cargo-c && \
   /root/.cargo/bin/cargo cinstall --release
