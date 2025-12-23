@@ -1,5 +1,5 @@
-ARG BUILD_IMAGE=ubuntu:20.04
-ARG DEPLOY_IMAGE=ubuntu:20.04
+ARG BUILD_IMAGE=ubuntu:24.04
+ARG DEPLOY_IMAGE=ubuntu:24.04
 
 FROM $BUILD_IMAGE AS builder
 
@@ -98,15 +98,13 @@ RUN mkdir -p /dist && cd /dist && \
 COPY ./contrib /contrib
 
 RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
-  patch -p1 < /contrib/ffmpeg-jsonstats.patch && \
-  patch -p1 < /contrib/ffmpeg-hls.patch && \
+  patch -p1 < /contrib/ffmpeg-patches.patch && \
   ./configure \
   --extra-version="flumixa-${BUILD_COMMIT}-${BUILD_DATE}" \
   --prefix="${SRC}" \
   --enable-nonfree \
   --enable-gpl \
   --enable-version3 \
-  --enable-postproc \
   --enable-static \
   --enable-openssl \
   --enable-libxml2 \

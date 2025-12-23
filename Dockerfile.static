@@ -1,6 +1,4 @@
-# Filename: Dockerfile.static
-
-FROM alpine:3.21 AS builder
+FROM alpine:3.23.2 AS builder
 
 ARG BUILD_DATE=1970-01-01T00:00:00Z
 ARG BUILD_COMMIT=unknown
@@ -31,8 +29,7 @@ COPY ./contrib /contrib
 
 # Konfigurieren & statisch kompilieren
 RUN cd ffmpeg-${FFMPEG_VERSION} && \
-    patch -p1 < /contrib/ffmpeg-jsonstats.patch && \
-    patch -p1 < /contrib/ffmpeg-hls.patch && \
+    patch -p1 < /contrib/ffmpeg-patches.patch && \
     ./configure \
         --extra-version="flumixa-${BUILD_COMMIT}-${BUILD_DATE}" \
         --prefix="${SRC}" \
@@ -40,7 +37,6 @@ RUN cd ffmpeg-${FFMPEG_VERSION} && \
         --enable-nonfree \
         --enable-gpl \
         --enable-version3 \
-        --enable-postproc \
         --enable-static \
         --disable-shared \
         --disable-ffplay \

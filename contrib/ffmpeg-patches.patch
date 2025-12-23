@@ -1,0 +1,175 @@
+diff --git a/fftools/ffmpeg.c b/fftools/ffmpeg.c
+index cbeefb71d6..c350f2453e 100644
+--- a/fftools/ffmpeg.c
++++ b/fftools/ffmpeg.c
+@@ -552,6 +552,8 @@ void update_benchmark(const char *fmt, ...)
+     }
+ }
+ 
++#include "libavutil/pixdesc.h"
++
+ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_time, int64_t pts)
+ {
+     AVBPrint buf, buf_script;
+@@ -634,6 +636,72 @@ static void print_report(int is_last_report, int64_t timer_start, int64_t cur_ti
+     bitrate = pts != AV_NOPTS_VALUE && pts && total_size >= 0 ? total_size * 8 / (pts / 1000.0) : -1;
+     speed   = pts != AV_NOPTS_VALUE && t != 0.0 ? (double)pts / AV_TIME_BASE / t : -1;
+ 
++    if (json_stats) {
++        double main_q = -1.0;
++        uint64_t main_frame = 0;
++        double main_fps = 0;
++        for (OutputStream *ost = ost_iter(NULL); ost; ost = ost_iter(ost)) {
++            if (ost->type == AVMEDIA_TYPE_VIDEO) {
++                main_q = ost->enc ? atomic_load(&ost->quality) / (float) FF_QP2LAMBDA : -1;
++                main_frame = atomic_load(&ost->packets_written);
++                main_fps = t > 1 ? main_frame / t : 0;
++                break;
++            }
++        }
++
++        fprintf(stderr, "JSONProgress:{\"inputs\":[");
++        for (InputStream *ist = ist_iter(NULL); ist; ist = ist_iter(ist)) {
++            int64_t i_size = ist->file->ctx->pb ? avio_size(ist->file->ctx->pb) : -1;
++            uint64_t i_frame = (ist->par->codec_type == AVMEDIA_TYPE_VIDEO) ? ist->decoder->frames_decoded : ist->decoder->samples_decoded;
++            double i_fps = (ist->par->codec_type == AVMEDIA_TYPE_VIDEO && t > 1) ? i_frame / t : 0;
++            double i_bitrate = (pts != AV_NOPTS_VALUE && pts && i_size >= 0) ? i_size * 8 / (pts / 1000.0) : -1;
++
++            fprintf(stderr, "{\"id\":%d, \"stream\":%d, \"type\":\"%s\", \"codec\":\"%s\", \"coder\":\"%s\"",
++                    ist->file->index, ist->index, av_get_media_type_string(ist->par->codec_type),
++                    ist->dec ? ist->dec->name : "unknown", ist->dec ? ist->dec->name : "unknown");
++
++            if (ist->par->codec_type == AVMEDIA_TYPE_VIDEO) {
++                fprintf(stderr, ", \"pix_fmt\":\"%s\", \"frame\":%"PRId64", \"fps\":%.2f, \"width\":%d, \"height\":%d",
++                        av_get_pix_fmt_name(ist->par->format), i_frame, i_fps, ist->par->width, ist->par->height);
++            } else if (ist->par->codec_type == AVMEDIA_TYPE_AUDIO) {
++                char layout_buf[1024];
++                av_channel_layout_describe(&ist->par->ch_layout, layout_buf, sizeof(layout_buf));
++                fprintf(stderr, ", \"frame\":%"PRId64", \"sampling_hz\":%d, \"layout\":\"%s\"",
++                        i_frame, ist->par->sample_rate, layout_buf);
++            }
++            fprintf(stderr, ", \"size_kb\":%"PRId64", \"bitrate_kbps\":%.1f}", i_size / 1024, i_bitrate);
++            if (ist_iter(ist)) fprintf(stderr, ",");
++        }
++        fprintf(stderr, "], \"outputs\":[");
++        for (OutputStream *ost = ost_iter(NULL); ost; ost = ost_iter(ost)) {
++            int64_t o_size = ost->st->codecpar->extradata_size; // This is not the output size, need to find where it is stored.
++            // Actually total_size is for the first output file.
++            int64_t ost_size = of_filesize(ost->file); // size of the file this stream belongs to
++            uint64_t o_frame = atomic_load(&ost->packets_written);
++            double o_fps = (ost->type == AVMEDIA_TYPE_VIDEO && t > 1) ? o_frame / t : 0;
++            double o_bitrate = (pts != AV_NOPTS_VALUE && pts && ost_size >= 0) ? ost_size * 8 / (pts / 1000.0) : -1;
++            const float o_q = ost->enc ? atomic_load(&ost->quality) / (float) FF_QP2LAMBDA : -1;
++
++            fprintf(stderr, "{\"id\":%d, \"stream\":%d, \"type\":\"%s\", \"codec\":\"%s\", \"coder\":\"%s\"",
++                    ost->file->index, ost->index, av_get_media_type_string(ost->type),
++                    ost->enc ? ost->enc->enc_ctx->codec->name : "unknown", ost->enc ? ost->enc->enc_ctx->codec->name : "unknown");
++
++            if (ost->type == AVMEDIA_TYPE_VIDEO) {
++                fprintf(stderr, ", \"pix_fmt\":\"%s\", \"frame\":%"PRId64", \"fps\":%.2f, \"q\":%.1f, \"width\":%d, \"height\":%d",
++                        av_get_pix_fmt_name(ost->st->codecpar->format), o_frame, o_fps, o_q, ost->st->codecpar->width, ost->st->codecpar->height);
++            } else if (ost->type == AVMEDIA_TYPE_AUDIO) {
++                char layout_buf[1024];
++                av_channel_layout_describe(&ost->st->codecpar->ch_layout, layout_buf, sizeof(layout_buf));
++                fprintf(stderr, ", \"frame\":%"PRId64", \"sampling_hz\":%d, \"layout\":\"%s\"",
++                        o_frame, ost->st->codecpar->sample_rate, layout_buf);
++            }
++            fprintf(stderr, ", \"size_kb\":%"PRId64", \"bitrate_kbps\":%.1f}", ost_size / 1024, o_bitrate);
++            if (ost_iter(ost)) fprintf(stderr, ",");
++        }
++        fprintf(stderr, "], \"frame\":%"PRId64", \"fps\":%.2f, \"q\":%.1f, \"size_kb\":%"PRId64", \"bitrate_kbps\":%.1f, \"time\":\"%s%02"PRId64"h%02dm%02d.%02ds\", \"speed\":%.3f, \"dup\":%"PRId64", \"drop\":%"PRId64"}\n",
++                main_frame, main_fps, main_q, total_size / 1024, bitrate, hours_sign, hours, mins, secs, (100 * us) / AV_TIME_BASE, speed, nb_frames_dup, nb_frames_drop);
++    }
++
+     if (total_size < 0) av_bprintf(&buf, "size=N/A time=");
+     else                av_bprintf(&buf, "size=%8.0fKiB time=", total_size / 1024.0);
+     if (pts == AV_NOPTS_VALUE) {
+diff --git a/fftools/ffmpeg.h b/fftools/ffmpeg.h
+index 53f71bc080..76af7cf20e 100644
+--- a/fftools/ffmpeg.h
++++ b/fftools/ffmpeg.h
+@@ -730,6 +730,7 @@ extern int debug_ts;
+ extern int exit_on_error;
+ extern int abort_on_flags;
+ extern int print_stats;
++extern int json_stats;
+ extern int64_t stats_period;
+ extern int stdin_interaction;
+ extern AVIOContext *progress_avio;
+diff --git a/fftools/ffmpeg_opt.c b/fftools/ffmpeg_opt.c
+index d714a1523a..73b9ed3f09 100644
+--- a/fftools/ffmpeg_opt.c
++++ b/fftools/ffmpeg_opt.c
+@@ -71,6 +71,7 @@ int debug_ts          = 0;
+ int exit_on_error     = 0;
+ int abort_on_flags    = 0;
+ int print_stats       = -1;
++int json_stats        = 1;
+ int stdin_interaction = 1;
+ float max_error_rate  = 2.0/3;
+ char *filter_nbthreads;
+@@ -1758,6 +1759,9 @@ const OptionDef options[] = {
+     { "stats",               OPT_TYPE_BOOL, 0,
+         { &print_stats },
+         "print progress report during encoding", },
++    { "jsonstats",           OPT_TYPE_BOOL, 0,
++        { &json_stats },
++        "print json progress report during encoding", },
+     { "stats_period",        OPT_TYPE_FUNC, OPT_FUNC_ARG | OPT_EXPERT,
+         { .func_arg = opt_stats_period },
+         "set the period at which ffmpeg updates stats and -progress output", "time" },
+diff --git a/libavdevice/v4l2.c b/libavdevice/v4l2.c
+index c38ecbb378..30cd347ccc 100644
+--- a/libavdevice/v4l2.c
++++ b/libavdevice/v4l2.c
+@@ -134,15 +134,27 @@ static int device_open(AVFormatContext *ctx, const char* device_path)
+     int err;
+     int flags = O_RDWR;
+ 
++#if HAVE_IOCTL_POSIX
+ #define SET_WRAPPERS(prefix) do {       \
+     s->open_f   = prefix ## open;       \
+     s->close_f  = prefix ## close;      \
+     s->dup_f    = prefix ## dup;        \
+-    s->ioctl_f  = prefix ## ioctl;      \
++    s->ioctl_f  = (int (*)(int, int, ...))prefix ## ioctl;      \
+     s->read_f   = prefix ## read;       \
+     s->mmap_f   = prefix ## mmap;       \
+     s->munmap_f = prefix ## munmap;     \
+ } while (0)
++#else
++#define SET_WRAPPERS(prefix) do {       \
++    s->open_f   = prefix ## open;       \
++    s->close_f  = prefix ## close;      \
++    s->dup_f    = prefix ## dup;        \
++    s->ioctl_f  = (int (*)(int, unsigned long int, ...))prefix ## ioctl;      \
++    s->read_f   = prefix ## read;       \
++    s->mmap_f   = prefix ## mmap;       \
++    s->munmap_f = prefix ## munmap;     \
++} while (0)
++#endif
+ 
+     if (s->use_libv4l2) {
+ #if CONFIG_LIBV4L2
+diff --git a/libavformat/hlsenc.c b/libavformat/hlsenc.c
+index d3db83093c..8cea333ebc 100644
+--- a/libavformat/hlsenc.c
++++ b/libavformat/hlsenc.c
+@@ -1567,12 +1567,16 @@ static int create_master_playlist(AVFormatContext *s,
+             bandwidth = vs->max_bitrate;
+             avg_bandwidth = vs->avg_bitrate;
+         } else {
+-            bandwidth = 0;
++            bandwidth = vs->max_bitrate;
++            avg_bandwidth = vs->avg_bitrate;
+             if (vid_st)
+                 bandwidth += get_stream_bit_rate(vid_st);
+             if (aud_st)
+                 bandwidth += get_stream_bit_rate(aud_st);
+             bandwidth += bandwidth / 10;
++
++            bandwidth = FFMAX(bandwidth, vs->max_bitrate);
++            avg_bandwidth = FFMAX(avg_bandwidth, vs->avg_bitrate);
+         }
+ 
+         ccgroup = NULL;

@@ -1,4 +1,4 @@
-ARG BUILD_IMAGE=alpine:3.15
+ARG BUILD_IMAGE=alpine:3.23.2
 
 FROM $BUILD_IMAGE AS builder
 
@@ -67,8 +67,7 @@ RUN echo $uname
 RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
   apkArch="$(apk --print-arch)" && if [ $apkArch != "aarch64" ]; then MMAL_SUPPORT="--enable-mmal"; fi && \
   apkArch="$(apk --print-arch)" && if [ $apkArch != "aarch64" ]; then OMX_SUPPORT="--enable-omx --enable-omx-rpi"; fi && \
-  patch -p1 < /contrib/ffmpeg-jsonstats.patch && \
-  patch -p1 < /contrib/ffmpeg-hls.patch && \
+  patch -p1 < /contrib/ffmpeg-patches.patch && \
   ./configure \
   --extra-version="flumixa-${BUILD_COMMIT}-${BUILD_DATE}" \
   --prefix="${SRC}" \
@@ -76,7 +75,6 @@ RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
   --enable-nonfree \
   --enable-gpl \
   --enable-version3 \
-  --enable-postproc \
   --enable-static \
   --enable-openssl \
   --enable-libxml2 \

@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   push:
     branches:
-      - 7.1
+      - "8.0"
 
 jobs:
   build-static:
@@ -13,17 +13,17 @@ jobs:
     strategy:
       matrix:
         include:
-          - ffmpeg_version: "7.1.1"
+          - ffmpeg_version: "8.0"
             os: alpine
-            os_version: "3.21"
+            os_version: "3.23.2"
             platform: linux/amd64
-          - ffmpeg_version: "7.1.1"
+          - ffmpeg_version: "8.0"
             os: alpine
-            os_version: "3.21"
+            os_version: "3.23.2"
             platform: linux/arm64
-          - ffmpeg_version: "7.1.1"
+          - ffmpeg_version: "8.0"
             os: alpine
-            os_version: "3.21"
+            os_version: "3.23.2"
             platform: linux/arm/v7
 
     steps:
