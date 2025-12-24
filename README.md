@@ -7,7 +7,7 @@ FFmpeg base image for [flumixa](https://github.com/flumixa).
 [![ubuntu-ffmpeg-vvapi](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_ubuntu-vaapi.yaml/badge.svg)](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_ubuntu-vaapi.yaml)
 [![ubuntu-cuda](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_ubuntu-cuda.yaml/badge.svg)](https://github.com/flumixa/ffmpeg/actions/workflows/build_base_ubuntu-cuda.yaml)
 
-Branch: 7.1
+Branch: 8.0
 
 ## Config:
 
