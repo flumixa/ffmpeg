@@ -33,12 +33,13 @@ _Additional information can be found in the Dockerfiles._
 
 ## Images and Platforms:
 
-| Dockerimage                                                | OS           | Plattform                                | GPU                                         |
-|------------------------------------------------------------|--------------|------------------------------------------|---------------------------------------------|
-| docker.io/sharapov/flumixa-base:alpine-ffmpeg-latest       | Alpine 3.21  | linux/amd64, linux/arm64, linux/arm/v7   | -                                           |
-| docker.io/sharapov/flumixa-base:alpine-ffmpeg-rpi-latest   | Alpine 3.21  | Raspberry Pi (linux/arm/v7, linux/arm64) | MMAL/OMX/V4L2-M2M (32bit), V4L2-M2M (64bit) |
-| docker.io/sharapov/flumixa-base:ubuntu-ffmpeg-cuda-latest  | Ubuntu 24.04 | linux/amd64                              | Nvidia Cuda                                 |
-| docker.io/sharapov/flumixa-base:ubuntu-ffmpeg-vaapi-latest | Ubuntu 24.04 | linux/amd64                              | Intel VAAPI                                 |
+| Dockerimage                                          | OS            | Plattform                                | GPU                                         |
+|------------------------------------------------------|---------------|------------------------------------------|---------------------------------------------|
+| docker.io/sharapov/flumixa-base:ffmpeg-latest        | Alpine 3.23.2 | linux/amd64, linux/arm64, linux/arm/v7   | -                                           |
+| docker.io/sharapov/flumixa-base:ffmpeg-rpi-latest    | Alpine 3.23.2 | Raspberry Pi (linux/arm/v7, linux/arm64) | MMAL/OMX/V4L2-M2M (32bit), V4L2-M2M (64bit) |
+| docker.io/sharapov/flumixa-base:ffmpeg-cuda12-latest | Ubuntu 24.04  | linux/amd64                              | Nvidia Cuda                                 |
+| docker.io/sharapov/flumixa-base:ffmpeg-cuda13-latest | Ubuntu 24.04  | linux/amd64                              | Nvidia Cuda                                 |
+| docker.io/sharapov/flumixa-base:ffmpeg-vaapi-latest  | Ubuntu 24.04  | linux/amd64                              | Intel VAAPI                                 |
 
 More tags: https://hub.docker.com/repository/docker/sharapov/flumixa-base/general
 

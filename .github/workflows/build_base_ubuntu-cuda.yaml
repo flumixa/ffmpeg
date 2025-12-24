@@ -69,3 +69,4 @@ jobs:
           push: true
           tags: |
             sharapov/flumixa-base:ffmpeg${{ matrix.ffmpeg_version }}-cuda-${{ matrix.os }}${{ matrix.os_version }}-cuda${{ matrix.cuda_version }}
+            sharapov/flumixa-base:ffmpeg-cuda${{ matrix.cuda_version }}-latest
