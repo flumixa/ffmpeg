@@ -52,10 +52,11 @@ $ ./Build.sh {arg}
 
 Args:
 
-- default (alpine-ffmpeg-latest)
-- rpi (alpine-ffmpeg-rpi-latest)
-- cuda (ubuntu-ffmpeg-cuda-latest)
-- vaapi (ubuntu-ffmpeg-vaapi-latest)
+- default (ffmpeg-latest)
+- rpi (ffmpeg-rpi-latest)
+- cuda12 (ffmpeg-cuda12-latest)
+- cuda13 (ffmpeg-cuda13-latest)
+- vaapi (ffmpeg-vaapi-latest)
 
 ## Known problems:
 
