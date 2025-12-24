@@ -48,7 +48,8 @@ RUN apt-get update -y && \
   libxcb-xfixes0-dev \
   libxcb-shm0-dev \
   libxcb-shape0-dev \
-  zlib1g-dev
+  zlib1g-dev \
+  cuda-command-line-tools-13-1
 
 # install and patch ffmpeg
 RUN mkdir -p /dist && cd /dist && \
@@ -70,6 +71,7 @@ RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
   --prefix="${SRC}" \
   --extra-cflags=-I/usr/local/cuda/include \
   --extra-ldflags=-L/usr/local/cuda/lib64 \
+  --nvccflags="-I/usr/local/cuda/include" \
   --enable-nonfree \
   --enable-gpl \
   --enable-version3 \
