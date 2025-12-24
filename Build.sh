@@ -64,7 +64,7 @@ function build_cuda13() {
   export OS_NAME=ubuntu
   export OS_VERSION=24.04
   export FFMPEG_VERSION=8.0
-  export FFNVCODEC_VERSION=12.2.72.0
+  export FFNVCODEC_VERSION=13.0.19.0
   export CUDA_VERSION=13.1.0
 
   docker build \
