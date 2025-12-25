@@ -18,13 +18,13 @@ jobs:
             os_version: "3.21"
             platforms: linux/arm64, linux/arm/v7
     steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        
       - name: Set build metadata
         run: |
           echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
           echo "BUILD_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-
-      - name: Checkout
-        uses: actions/checkout@v4
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@master

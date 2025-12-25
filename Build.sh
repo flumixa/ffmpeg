@@ -49,7 +49,7 @@ function build_rpi() {
     --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.alpine.rpi \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} .
-  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:ffmpeg-latest
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:ffmpeg-rpi-latest
 }
 
 function build_cuda12() {
