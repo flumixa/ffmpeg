@@ -11,6 +11,8 @@ function build_default_native() {
     --progress=plain \
     --build-arg BUILD_IMAGE=$OS_NAME:$OS_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
+    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.alpine \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
 }
@@ -25,6 +27,8 @@ function build_default() {
     --progress=plain \
     --build-arg BUILD_IMAGE=$OS_NAME:$OS_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
+    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     --platform linux/amd64 \
     -f Dockerfile.alpine \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
@@ -39,6 +43,8 @@ function build_rpi() {
     --progress=plain \
     --build-arg BUILD_IMAGE=$OS_NAME:$OS_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
+    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.alpine.rpi \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} .
 }
@@ -54,6 +60,8 @@ function build_cuda12() {
     --progress=plain \
     --build-arg BUILD_IMAGE=nvidia/cuda:$CUDA_VERSION-devel-ubuntu$OS_VERSION \
     --build-arg DEPLOY_IMAGE=nvidia/cuda:$CUDA_VERSION-runtime-ubuntu$OS_VERSION \
+    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     --build-arg FFNVCODEC_VERSION=$FFNVCODEC_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     -f Dockerfile.ubuntu.cuda12 \
@@ -71,6 +79,8 @@ function build_cuda13() {
     --progress=plain \
     --build-arg BUILD_IMAGE=nvidia/cuda:$CUDA_VERSION-devel-ubuntu$OS_VERSION \
     --build-arg DEPLOY_IMAGE=nvidia/cuda:$CUDA_VERSION-runtime-ubuntu$OS_VERSION \
+    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     --build-arg FFNVCODEC_VERSION=$FFNVCODEC_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     -f Dockerfile.ubuntu.cuda13 \
@@ -87,6 +97,8 @@ function build_vaapi() {
     --progress=plain \
     --build-arg BUILD_IMAGE=$OS_NAME:$OS_VERSION \
     --build-arg DEPLOY_IMAGE=$OS_NAME:$OS_VERSION \
+    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     --platform linux/amd64 \
     -f Dockerfile.ubuntu.vaapi \

@@ -29,8 +29,8 @@ jobs:
     steps:
       - name: Set build metadata
         run: |
-          echo "CURRENT_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
-          echo "CURRENT_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> $GITHUB_ENV
+          echo "BUILD_COMMIT=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
       - name: Checkout
         uses: actions/checkout@v4
