@@ -57,3 +57,4 @@ jobs:
           push: true
           tags: |
             sharapov/flumixa-base:ffmpeg${{ matrix.ffmpeg_version }}-rpi-${{ matrix.os }}${{ matrix.os_version }}
+            sharapov/flumixa-base:ffmpeg-rpi-latest

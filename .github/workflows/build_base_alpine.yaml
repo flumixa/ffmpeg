@@ -47,7 +47,7 @@ jobs:
         with:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
-          file: ./Dockerfile.alpine.rpi
+          file: ./Dockerfile.alpine
           build-args: |
             BUILD_IMAGE=${{ matrix.os }}:${{ matrix.os_version }}
             BUILD_DATE=${{ env.CURRENT_DATE }}
@@ -57,3 +57,4 @@ jobs:
           push: true
           tags: |
             sharapov/flumixa-base:ffmpeg${{ matrix.ffmpeg_version }}-${{ matrix.os }}${{ matrix.os_version }}
+            sharapov/flumixa-base:ffmpeg-latest
