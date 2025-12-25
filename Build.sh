@@ -2,14 +2,11 @@
 
 set -au
 
-function source_env() {
-  env=${1:-.env}
-  [ ! -f "${env}" ] && { echo "Env file ${env} doesn't exist"; return 1; }
-  eval $(sed -e '/^\s*$/d' -e '/^\s*#/d' -e 's/=/="/' -e 's/$/"/' -e 's/^/export /' "${env}")
-}
-
 function build_default_native() {
-  source_env ./Build.alpine.env
+  export OS_NAME=alpine
+  export OS_VERSION=3.20
+  export FFMPEG_VERSION=7.0.2
+
   docker build \
     --progress=plain \
     --build-arg BUILD_IMAGE=$OS_NAME:$OS_VERSION \
@@ -18,14 +15,14 @@ function build_default_native() {
     --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.alpine \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
-  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-$OS_VERSION-$FFMPEG_VERSION
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:alpine-ffmpeg-latest
 }
 
 function build_default() {
-  source_env ./Build.alpine.env
-  # "--load" does not support multiple platforms
-  # use "--push" to publish
-  # --platform linux/amd64,linux/arm64,linux/arm/v7
+  export OS_NAME=alpine
+  export OS_VERSION=3.20
+  export FFMPEG_VERSION=7.0.2
+
   docker buildx build \
     --load \
     --progress=plain \
@@ -36,13 +33,14 @@ function build_default() {
     --platform linux/amd64 \
     -f Dockerfile.alpine \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
-  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-$OS_VERSION-$FFMPEG_VERSION
-  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-latest
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:ffmpeg-latest
 }
 
 function build_rpi() {
-  source_env ./Build.alpine.env
-  source_env ./Build.alpine.rpi.env
+  export OS_NAME=alpine
+  export OS_VERSION=3.20
+  export FFMPEG_VERSION=7.0.2
+
   docker build \
     --progress=plain \
     --build-arg BUILD_IMAGE=$OS_NAME:$OS_VERSION \
@@ -51,52 +49,66 @@ function build_rpi() {
     --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.alpine.rpi \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} .
-  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-rpi-$OS_VERSION-$FFMPEG_VERSION
-  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:$OS_NAME-ffmpeg-rpi-latest
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:ffmpeg-rpi-latest
 }
 
 function build_cuda11() {
-  source_env ./Build.ubuntu.cuda11.env
+  export OS_NAME=ubuntu
+  export OS_VERSION=22.04
+  export FFMPEG_VERSION=7.0.2
+  export CUDA_VERSION=11.8.0
+  export FFNVCODEC_VERSION=11.1.5.3
+
   docker build \
     --progress=plain \
-    --build-arg BUILD_IMAGE=nvidia/cuda:$CUDA_VERSION-devel-ubuntu$OS_VERSION \
-    --build-arg DEPLOY_IMAGE=nvidia/cuda:$CUDA_VERSION-runtime-ubuntu$OS_VERSION \
-    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
+    --build-arg BUILD_IMAGE=nvidia/cuda:$CUDA_VERSION-devel-$OS_NAME$OS_VERSION \
+    --build-arg DEPLOY_IMAGE=nvidia/cuda:$CUDA_VERSION-runtime-$OS_NAME$OS_VERSION \
     --build-arg FFNVCODEC_VERSION=$FFNVCODEC_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
+    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.ubuntu.cuda11 \
-    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-ubuntu$OS_VERSION-cuda${CUDA_VERSION} .
+    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-$OS_NAME$OS_VERSION-cuda${CUDA_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-$OS_NAME$OS_VERSION-cuda${CUDA_VERSION} sharapov/flumixa-base:ffmpeg-cuda11-latest
 }
 
 function build_cuda12() {
-  source_env ./Build.ubuntu.cuda12.env
+  export OS_NAME=ubuntu
+  export OS_VERSION=24.04
+  export FFMPEG_VERSION=7.0.2
+  export CUDA_VERSION=12.8.0
+  export FFNVCODEC_VERSION=12.2.72.0
+
   docker build \
     --progress=plain \
-    --build-arg BUILD_IMAGE=nvidia/cuda:$CUDA_VERSION-devel-ubuntu$OS_VERSION \
-    --build-arg DEPLOY_IMAGE=nvidia/cuda:$CUDA_VERSION-runtime-ubuntu$OS_VERSION \
-    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
-    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
+    --build-arg BUILD_IMAGE=nvidia/cuda:$CUDA_VERSION-devel-$OS_NAME$OS_VERSION \
+    --build-arg DEPLOY_IMAGE=nvidia/cuda:$CUDA_VERSION-runtime-$OS_NAME$OS_VERSION \
     --build-arg FFNVCODEC_VERSION=$FFNVCODEC_VERSION \
     --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
+    --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+    --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.ubuntu.cuda12 \
-    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-ubuntu$OS_VERSION-cuda${CUDA_VERSION} .
+    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-$OS_NAME$OS_VERSION-cuda${CUDA_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-$OS_NAME$OS_VERSION-cuda${CUDA_VERSION} sharapov/flumixa-base:ffmpeg-cuda12-latest
 }
 
 function build_vaapi() {
-  source_env ./Build.ubuntu.env
-  source_env ./Build.ubuntu.vaapi.env
+  export OS_NAME=ubuntu
+  export OS_VERSION=24.04
+  export FFMPEG_VERSION=7.0.2
+
   docker buildx build \
     --load \
     --progress=plain \
     --build-arg BUILD_IMAGE=$OS_NAME:$OS_VERSION \
     --build-arg DEPLOY_IMAGE=$OS_NAME:$OS_VERSION \
+    --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
     --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
-    --build-arg FFMPEG_VERSION=$FFMPEG_VERSION \
     --platform linux/amd64 \
     -f Dockerfile.ubuntu.vaapi \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-vaapi-${OS_NAME}${OS_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-vaapi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:ffmpeg-vaapi-latest
 }
 
 main() {
