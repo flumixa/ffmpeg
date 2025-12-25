@@ -15,6 +15,7 @@ function build_default_native() {
     --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.alpine \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:alpine-ffmpeg-latest
 }
 
 function build_default() {
@@ -32,6 +33,7 @@ function build_default() {
     --platform linux/amd64 \
     -f Dockerfile.alpine \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:ffmpeg-latest
 }
 
 function build_rpi() {
@@ -47,12 +49,14 @@ function build_rpi() {
     --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.alpine.rpi \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-rpi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:ffmpeg-latest
 }
 
 function build_cuda12() {
   export OS_NAME=ubuntu
   export OS_VERSION=24.04
   export FFMPEG_VERSION=7.1.1
+  export CUDA_VERSION=12.8.0
   export FFNVCODEC_VERSION=12.2.72.0
 
   docker build \
@@ -64,7 +68,8 @@ function build_cuda12() {
     --build-arg BUILD_DATE="$(date -u +'%Y-%m-%dT%H:%M:%SZ')" \
     --build-arg BUILD_COMMIT="$(git rev-parse --short HEAD || echo "unknown")" \
     -f Dockerfile.ubuntu.cuda12 \
-    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-ubuntu$OS_VERSION-cuda${CUDA_VERSION} .
+    -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-$OS_NAME$OS_VERSION-cuda${CUDA_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-cuda-$OS_NAME$OS_VERSION-cuda${CUDA_VERSION} sharapov/flumixa-base:ffmpeg-cuda${CUDA_VERSION}-latest
 }
 
 function build_vaapi() {
@@ -83,6 +88,7 @@ function build_vaapi() {
     --platform linux/amd64 \
     -f Dockerfile.ubuntu.vaapi \
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-vaapi-${OS_NAME}${OS_VERSION} .
+  docker tag sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-vaapi-${OS_NAME}${OS_VERSION} sharapov/flumixa-base:ffmpeg-vaapi-latest
 }
 
 main() {
