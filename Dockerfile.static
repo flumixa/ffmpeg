@@ -29,7 +29,8 @@ COPY ./contrib /contrib
 
 # Konfigurieren & statisch kompilieren
 RUN cd ffmpeg-${FFMPEG_VERSION} && \
-    patch -p1 < /contrib/ffmpeg-patches.patch && \
+    patch -p1 < /contrib/ffmpeg-jsonstats.patch && \
+    patch -p1 < /contrib/ffmpeg-hls.patch && \
     ./configure \
         --extra-version="flumixa-${BUILD_COMMIT}-${BUILD_DATE}" \
         --prefix="${SRC}" \
