@@ -18,10 +18,10 @@ RUN apt-get update -y && \
   curl \
   libcurl4-openssl-dev \
   git \
-  nasm \
   openssl \
   libssl-dev \
   cmake \
+  nasm \
   yasm \
   build-essential \
   libtool \
@@ -49,7 +49,8 @@ RUN apt-get update -y && \
   libxcb-shm0-dev \
   libxcb-shape0-dev \
   zlib1g-dev \
-  cuda-command-line-tools-13-1
+  libnuma1 \
+  libnuma-dev
 
 # install and patch ffmpeg
 RUN mkdir -p /dist && cd /dist && \
@@ -72,7 +73,7 @@ RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
   --prefix="${SRC}" \
   --extra-cflags=-I/usr/local/cuda/include \
   --extra-ldflags=-L/usr/local/cuda/lib64 \
-  --nvccflags="-I/usr/local/cuda/include" \
+  --nvccflags="-gencode arch=compute_75,code=sm_75 -O2" \
   --enable-nonfree \
   --enable-gpl \
   --enable-version3 \
@@ -85,7 +86,6 @@ RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
   --enable-nvdec \
   --enable-nvenc \
   --enable-cuvid \
-  --enable-libnpp \
   --enable-libv4l2 \
   --enable-libfreetype \
   --enable-alsa \
