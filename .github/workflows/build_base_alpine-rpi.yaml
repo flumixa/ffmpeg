@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         include:
-          - ffmpeg_version: "8.0"
+          - ffmpeg_version: "8.0.1"
             os: alpine
             os_version: "3.23.2"
             platforms: linux/arm64, linux/arm/v7
