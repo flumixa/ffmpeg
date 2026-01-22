@@ -73,8 +73,6 @@ RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
   --enable-static \
   --enable-openssl \
   --enable-libxml2 \
-  --enable-libv4l2 \
-  --enable-v4l2_m2m \
   --enable-libfreetype \
   --enable-alsa \
   --enable-libsrt \
