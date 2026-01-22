@@ -81,8 +81,6 @@ RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
   --enable-libxml2 \
   $OMX_SUPPORT \
   $MMAL_SUPPORT \
-  --enable-libv4l2 \
-  --enable-v4l2_m2m \
   --enable-alsa \
   --enable-libfreetype \
   --enable-libsrt \
