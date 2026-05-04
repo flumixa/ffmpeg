@@ -105,9 +105,19 @@ function build_vaapi() {
     -t sharapov/flumixa-base:ffmpeg${FFMPEG_VERSION}-vaapi-${OS_NAME}${OS_VERSION} .
 }
 
+function build_macos() {
+  export FFMPEG_VERSION=8.0.1
+  bash "$(dirname "$0")/scripts/build-macos.sh"
+}
+
+function build_windows() {
+  export FFMPEG_VERSION=8.0.1
+  bash "$(dirname "$0")/scripts/build-windows.sh"
+}
+
 main() {
   if [[ $# == 0 ]]; then
-    echo "Options available: default, default_native, rpi, cuda12, cuda13, vaapi"
+    echo "Options available: default, default_native, rpi, cuda12, cuda13, vaapi, macos, windows"
     exit 0
   else
     if [[ $1 == "default" ]]; then
@@ -122,6 +132,10 @@ main() {
       build_cuda13
     elif [[ $1 == "vaapi" ]]; then
       build_vaapi
+    elif [[ $1 == "macos" ]]; then
+      build_macos
+    elif [[ $1 == "windows" ]]; then
+      build_windows
     fi
   fi
 }

@@ -1,0 +1,86 @@
+name: "base:ffmpeg-windows"
+
+on:
+  workflow_dispatch:
+    inputs:
+      ffmpeg_version:
+        description: "ffmpeg version (must match patches in contrib/)"
+        required: true
+        default: "8.0.1"
+  workflow_call:
+    inputs:
+      ffmpeg_version:
+        type: string
+        required: false
+        default: "8.0.1"
+
+jobs:
+  build:
+    name: build (x64)
+    runs-on: windows-latest
+    env:
+      FFMPEG_VERSION: ${{ inputs.ffmpeg_version || '8.0.1' }}
+    defaults:
+      run:
+        shell: msys2 {0}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSYS2 (MINGW64)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: MINGW64
+          update: true
+          install: >-
+            base-devel
+            git
+            tar
+            zip
+            curl
+            patch
+            mingw-w64-x86_64-toolchain
+            mingw-w64-x86_64-pkgconf
+            mingw-w64-x86_64-nasm
+            mingw-w64-x86_64-yasm
+            mingw-w64-x86_64-cmake
+            mingw-w64-x86_64-x264
+            mingw-w64-x86_64-x265
+            mingw-w64-x86_64-libvpx
+            mingw-w64-x86_64-lame
+            mingw-w64-x86_64-opus
+            mingw-w64-x86_64-libvorbis
+            mingw-w64-x86_64-fdk-aac
+            mingw-w64-x86_64-srt
+            mingw-w64-x86_64-freetype
+            mingw-w64-x86_64-openssl
+            mingw-w64-x86_64-dav1d
+            mingw-w64-x86_64-aom
+            mingw-w64-x86_64-libxml2
+            mingw-w64-x86_64-amf-headers
+
+      - name: Resolve build metadata
+        run: |
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+          echo "BUILD_COMMIT=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+
+      - name: Cache ffmpeg source tarball
+        uses: actions/cache@v4
+        with:
+          path: .work-windows-x64/ffmpeg-${{ env.FFMPEG_VERSION }}.tar.gz
+          key: ffmpeg-src-${{ env.FFMPEG_VERSION }}-windows
+
+      - name: Build ffmpeg
+        run: bash scripts/build-windows.sh
+
+      - name: Smoke test
+        run: |
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-windows-x64/ffmpeg.exe -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-windows-x64/ffmpeg.exe -buildconf
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-${{ env.FFMPEG_VERSION }}-windows-x64
+          path: dist/ffmpeg-${{ env.FFMPEG_VERSION }}-windows-x64.zip
+          retention-days: 14

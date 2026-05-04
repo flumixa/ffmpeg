@@ -1,0 +1,66 @@
+name: "release"
+
+# Triggered by pushing a tag like v8.0.1-flumixa-1.
+# Runs Mac/Win builds and publishes all artifacts (single-arch + universal +
+# windows zip) to a GitHub Release for that tag.
+
+on:
+  push:
+    tags:
+      - "v*"
+  workflow_dispatch:
+    inputs:
+      ffmpeg_version:
+        description: "ffmpeg version (must match patches in contrib/)"
+        required: true
+        default: "8.0.1"
+      tag:
+        description: "Release tag to create (e.g. v8.0.1-flumixa-manual-1)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build-macos:
+    uses: ./.github/workflows/build_macos.yaml
+    with:
+      ffmpeg_version: ${{ github.event.inputs.ffmpeg_version || '8.0.1' }}
+
+  build-windows:
+    uses: ./.github/workflows/build_windows.yaml
+    with:
+      ffmpeg_version: ${{ github.event.inputs.ffmpeg_version || '8.0.1' }}
+
+  publish:
+    name: publish release
+    needs: [build-macos, build-windows]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+
+      - name: Flatten artifacts directory
+        run: |
+          mkdir -p release
+          find artifacts -type f \( -name '*.tar.gz' -o -name '*.zip' \) -exec cp -v {} release/ \;
+          ls -lh release/
+
+      - name: Resolve release tag
+        id: tag
+        run: |
+          if [ "${{ github.event_name }}" = "push" ]; then
+            echo "name=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "name=${{ github.event.inputs.tag }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create / update GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.name }}
+          name: ${{ steps.tag.outputs.name }}
+          generate_release_notes: true
+          files: release/*

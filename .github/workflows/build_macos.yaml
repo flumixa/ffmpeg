@@ -1,0 +1,113 @@
+name: "base:ffmpeg-macos"
+
+on:
+  workflow_dispatch:
+    inputs:
+      ffmpeg_version:
+        description: "ffmpeg version (must match patches in contrib/)"
+        required: true
+        default: "8.0.1"
+  workflow_call:
+    inputs:
+      ffmpeg_version:
+        type: string
+        required: false
+        default: "8.0.1"
+
+jobs:
+  build:
+    name: build (${{ matrix.arch }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: arm64
+            runner: macos-14
+          - arch: x86_64
+            runner: macos-13
+    runs-on: ${{ matrix.runner }}
+    env:
+      FFMPEG_VERSION: ${{ inputs.ffmpeg_version || '8.0.1' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve build metadata
+        run: |
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+          echo "BUILD_COMMIT=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+
+      - name: Cache Homebrew downloads
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Caches/Homebrew
+          key: brew-${{ matrix.runner }}-v1
+
+      - name: Cache ffmpeg source tarball
+        uses: actions/cache@v4
+        with:
+          path: .work-macos-${{ matrix.arch }}/ffmpeg-${{ env.FFMPEG_VERSION }}.tar.gz
+          key: ffmpeg-src-${{ env.FFMPEG_VERSION }}
+
+      - name: Build ffmpeg
+        env:
+          ARCH: ${{ matrix.arch }}
+        run: bash scripts/build-macos.sh
+
+      - name: Smoke test
+        run: |
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffmpeg -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffmpeg -buildconf
+
+      - name: Upload single-arch artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}
+          path: dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}.tar.gz
+          retention-days: 14
+
+  universal:
+    name: lipo universal
+    needs: build
+    runs-on: macos-14
+    env:
+      FFMPEG_VERSION: ${{ inputs.ffmpeg_version || '8.0.1' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Download arm64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-arm64
+          path: artifacts/arm64
+
+      - name: Download x86_64 artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-x86_64
+          path: artifacts/x86_64
+
+      - name: Extract single-arch binaries
+        run: |
+          mkdir -p extracted/arm64 extracted/x86_64
+          tar -xzf "artifacts/arm64/ffmpeg-${FFMPEG_VERSION}-darwin-arm64.tar.gz" -C extracted/arm64 --strip-components=1
+          tar -xzf "artifacts/x86_64/ffmpeg-${FFMPEG_VERSION}-darwin-x86_64.tar.gz" -C extracted/x86_64 --strip-components=1
+
+      - name: Lipo merge
+        env:
+          ARM64_BIN: ${{ github.workspace }}/extracted/arm64/ffmpeg
+          AMD64_BIN: ${{ github.workspace }}/extracted/x86_64/ffmpeg
+        run: bash scripts/lipo-universal.sh
+
+      - name: Smoke test universal
+        run: |
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffmpeg -version
+          file ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffmpeg
+
+      - name: Upload universal artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal
+          path: dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal.tar.gz
+          retention-days: 14
