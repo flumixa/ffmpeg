@@ -90,13 +90,6 @@ cd "$SRC_DIR"
 CFLAGS="-arch ${ARCH} -mmacosx-version-min=11.0 -O2"
 LDFLAGS="-arch ${ARCH} -mmacosx-version-min=11.0"
 
-# When cross-building (host arm64 → x86_64 or vice versa) we need to tell
-# configure not to run host-specific autodetect.
-EXTRA_CONFIGURE=()
-if [ "$ARCH" != "$(uname -m | sed 's/aarch64/arm64/')" ]; then
-  EXTRA_CONFIGURE+=(--enable-cross-compile --target-os=darwin --arch="${ARCH}")
-fi
-
 ./configure \
   --prefix="${WORK}/install" \
   --extra-version="flumixa-${BUILD_COMMIT}-${BUILD_DATE}" \
@@ -125,8 +118,7 @@ fi
   --enable-audiotoolbox \
   --disable-ffplay \
   --disable-doc \
-  --disable-debug \
-  "${EXTRA_CONFIGURE[@]}"
+  --disable-debug
 
 echo "==> Building (-j${JOBS})"
 make -j"${JOBS}"
