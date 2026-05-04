@@ -87,8 +87,11 @@ echo "==> Configuring (${ARCH})"
 
 cd "$SRC_DIR"
 
-CFLAGS="-arch ${ARCH} -mmacosx-version-min=11.0 -O2"
-LDFLAGS="-arch ${ARCH} -mmacosx-version-min=11.0"
+# Apple's clang doesn't search Homebrew's prefix by default — pass it
+# explicitly so ffmpeg's configure can find headers/libs (e.g. lame, fdk-aac)
+# that don't ship pkg-config descriptors.
+CFLAGS="-arch ${ARCH} -mmacosx-version-min=11.0 -O2 -I${BREW_PREFIX}/include"
+LDFLAGS="-arch ${ARCH} -mmacosx-version-min=11.0 -L${BREW_PREFIX}/lib"
 
 ./configure \
   --prefix="${WORK}/install" \
