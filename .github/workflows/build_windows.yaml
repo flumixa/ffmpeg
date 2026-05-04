@@ -13,6 +13,13 @@ on:
         type: string
         required: false
         default: "8.0.1"
+  push:
+    branches:
+      - "8.0"
+    paths:
+      - "scripts/build-windows.sh"
+      - ".github/workflows/build_windows.yaml"
+      - "contrib/**"
 
 jobs:
   build:

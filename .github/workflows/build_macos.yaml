@@ -13,6 +13,14 @@ on:
         type: string
         required: false
         default: "8.0.1"
+  push:
+    branches:
+      - "8.0"
+    paths:
+      - "scripts/build-macos.sh"
+      - "scripts/lipo-universal.sh"
+      - ".github/workflows/build_macos.yaml"
+      - "contrib/**"
 
 jobs:
   build:
