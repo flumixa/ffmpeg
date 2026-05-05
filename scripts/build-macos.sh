@@ -16,6 +16,7 @@
 # Outputs:
 #   dist/ffmpeg-${FFMPEG_VERSION}-darwin-${ARCH}.tar.gz
 #   dist/ffmpeg-${FFMPEG_VERSION}-darwin-${ARCH}/ffmpeg
+#   dist/ffmpeg-${FFMPEG_VERSION}-darwin-${ARCH}/ffprobe
 
 set -euo pipefail
 
@@ -130,11 +131,15 @@ make -j"${JOBS}"
 # 4. Package
 # ---------------------------------------------------------------------------
 echo "==> Packaging"
-strip ffmpeg
-cp ffmpeg "${DIST}/${PKG_NAME}/ffmpeg"
+# ffprobe is produced by the same `make` invocation as ffmpeg (configure
+# leaves it enabled by default). Bundle both — downstream consumers (the
+# Wails desktop app) need ffprobe for media metadata extraction.
+strip ffmpeg ffprobe
+cp ffmpeg ffprobe "${DIST}/${PKG_NAME}/"
 
 # Print versioning info into the package for easy verification.
-"${DIST}/${PKG_NAME}/ffmpeg" -version > "${DIST}/${PKG_NAME}/ffmpeg.version.txt" 2>&1 || true
+"${DIST}/${PKG_NAME}/ffmpeg"  -version > "${DIST}/${PKG_NAME}/ffmpeg.version.txt"  2>&1 || true
+"${DIST}/${PKG_NAME}/ffprobe" -version > "${DIST}/${PKG_NAME}/ffprobe.version.txt" 2>&1 || true
 
 ( cd "$DIST" && tar -czf "${PKG_NAME}.tar.gz" "${PKG_NAME}" )
 

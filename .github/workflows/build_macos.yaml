@@ -64,8 +64,9 @@ jobs:
 
       - name: Smoke test
         run: |
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffmpeg -version
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffmpeg -buildconf
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffmpeg  -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffprobe -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffmpeg  -buildconf
 
       - name: Upload single-arch artifact
         uses: actions/upload-artifact@v4
@@ -102,16 +103,18 @@ jobs:
           tar -xzf "artifacts/arm64/ffmpeg-${FFMPEG_VERSION}-darwin-arm64.tar.gz" -C extracted/arm64 --strip-components=1
           tar -xzf "artifacts/x86_64/ffmpeg-${FFMPEG_VERSION}-darwin-x86_64.tar.gz" -C extracted/x86_64 --strip-components=1
 
-      - name: Lipo merge
+      - name: Lipo merge (handles every binary in the package — ffmpeg + ffprobe)
         env:
-          ARM64_BIN: ${{ github.workspace }}/extracted/arm64/ffmpeg
-          AMD64_BIN: ${{ github.workspace }}/extracted/x86_64/ffmpeg
+          ARM64_DIR: ${{ github.workspace }}/extracted/arm64
+          AMD64_DIR: ${{ github.workspace }}/extracted/x86_64
         run: bash scripts/lipo-universal.sh
 
       - name: Smoke test universal
         run: |
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffmpeg -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffmpeg  -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffprobe -version
           file ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffmpeg
+          file ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffprobe
 
       - name: Upload universal artifact
         uses: actions/upload-artifact@v4

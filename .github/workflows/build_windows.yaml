@@ -82,8 +82,9 @@ jobs:
 
       - name: Smoke test
         run: |
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-windows-x64/ffmpeg.exe -version
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-windows-x64/ffmpeg.exe -buildconf
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-windows-x64/ffmpeg.exe  -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-windows-x64/ffprobe.exe -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-windows-x64/ffmpeg.exe  -buildconf
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

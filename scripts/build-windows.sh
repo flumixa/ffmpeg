@@ -127,10 +127,14 @@ make -j"${JOBS}"
 # 4. Package
 # ---------------------------------------------------------------------------
 echo "==> Packaging"
-strip ffmpeg.exe
-cp ffmpeg.exe "${DIST}/${PKG_NAME}/ffmpeg.exe"
+# ffprobe.exe is built alongside ffmpeg.exe by the same `make` invocation
+# (configure leaves it enabled by default). Both go into the package — the
+# Wails desktop app uses ffprobe for media metadata extraction.
+strip ffmpeg.exe ffprobe.exe
+cp ffmpeg.exe ffprobe.exe "${DIST}/${PKG_NAME}/"
 
-"${DIST}/${PKG_NAME}/ffmpeg.exe" -version > "${DIST}/${PKG_NAME}/ffmpeg.version.txt" 2>&1 || true
+"${DIST}/${PKG_NAME}/ffmpeg.exe"  -version > "${DIST}/${PKG_NAME}/ffmpeg.version.txt"  2>&1 || true
+"${DIST}/${PKG_NAME}/ffprobe.exe" -version > "${DIST}/${PKG_NAME}/ffprobe.version.txt" 2>&1 || true
 
 ( cd "$DIST" && \
   if command -v zip >/dev/null 2>&1; then
