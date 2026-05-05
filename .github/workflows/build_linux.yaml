@@ -1,0 +1,70 @@
+name: "base:ffmpeg-linux"
+
+# Builds a fully-static ffmpeg + ffprobe for Linux x86_64 (musl libc, no
+# dynamic deps). Result runs on any Linux distro — Debian, Ubuntu,
+# Fedora, RHEL, Alpine — without needing apt-installed ffmpeg.
+
+on:
+  workflow_dispatch:
+    inputs:
+      ffmpeg_version:
+        description: "ffmpeg version (must match patches in contrib/)"
+        required: true
+        default: "8.0.1"
+  workflow_call:
+    inputs:
+      ffmpeg_version:
+        type: string
+        required: false
+        default: "8.0.1"
+  push:
+    branches:
+      - "8.0"
+    paths:
+      - "scripts/build-linux.sh"
+      - ".github/workflows/build_linux.yaml"
+      - "contrib/**"
+
+jobs:
+  build:
+    name: build (amd64)
+    runs-on: ubuntu-latest
+    container:
+      image: alpine:3.23.2
+    env:
+      FFMPEG_VERSION: ${{ inputs.ffmpeg_version || '8.0.1' }}
+    steps:
+      - name: Install git for checkout action
+        # actions/checkout needs git inside the container.
+        run: apk add --no-cache git
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Resolve build metadata
+        run: |
+          echo "BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ')" >> "$GITHUB_ENV"
+          echo "BUILD_COMMIT=$(git rev-parse --short HEAD)" >> "$GITHUB_ENV"
+
+      - name: Cache ffmpeg source tarball
+        uses: actions/cache@v4
+        with:
+          path: .work-linux-amd64/ffmpeg-${{ env.FFMPEG_VERSION }}.tar.gz
+          key: ffmpeg-linux-src-${{ env.FFMPEG_VERSION }}
+
+      - name: Build ffmpeg
+        run: sh scripts/build-linux.sh
+
+      - name: Smoke test
+        run: |
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-linux-amd64/ffmpeg  -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-linux-amd64/ffprobe -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-linux-amd64/ffmpeg  -buildconf
+          file ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-linux-amd64/ffmpeg
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ffmpeg-${{ env.FFMPEG_VERSION }}-linux-amd64
+          path: dist/ffmpeg-${{ env.FFMPEG_VERSION }}-linux-amd64.tar.gz
+          retention-days: 14

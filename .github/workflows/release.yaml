@@ -1,8 +1,11 @@
 name: "release"
 
 # Triggered by pushing a tag like v8.0.1-flumixa-1.
-# Runs Mac/Win builds and publishes all artifacts (single-arch + universal +
-# windows zip) to a GitHub Release for that tag.
+# Runs Mac/Win builds and publishes whatever artifacts they uploaded
+# (currently macOS arm64 + Windows x64) to a GitHub Release for that tag.
+# The publish step is generic — anything *.tar.gz/*.zip from either build
+# job gets attached, so re-adding universal/x86_64/etc. doesn't need
+# changes here.
 
 on:
   push:
@@ -32,9 +35,14 @@ jobs:
     with:
       ffmpeg_version: ${{ github.event.inputs.ffmpeg_version || '8.0.1' }}
 
+  build-linux:
+    uses: ./.github/workflows/build_linux.yaml
+    with:
+      ffmpeg_version: ${{ github.event.inputs.ffmpeg_version || '8.0.1' }}
+
   publish:
     name: publish release
-    needs: [build-macos, build-windows]
+    needs: [build-macos, build-windows, build-linux]
     runs-on: ubuntu-latest
     steps:
       - name: Download all artifacts
