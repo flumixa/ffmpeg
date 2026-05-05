@@ -1,5 +1,13 @@
 name: "base:ffmpeg-macos"
 
+# Builds ffmpeg + ffprobe for Apple Silicon (arm64) only.
+#
+# x86_64 was dropped because GitHub's macos-13 (Intel) runner pool is heavily
+# congested and Intel macOS is being phased out — jobs queued for hours
+# waiting for an Intel runner. To re-enable, restore the matrix include for
+# arch:x86_64 + runner:macos-13 and the universal lipo job at the bottom of
+# this file (see git history for the full version).
+
 on:
   workflow_dispatch:
     inputs:
@@ -18,24 +26,16 @@ on:
       - "8.0"
     paths:
       - "scripts/build-macos.sh"
-      - "scripts/lipo-universal.sh"
       - ".github/workflows/build_macos.yaml"
       - "contrib/**"
 
 jobs:
   build:
-    name: build (${{ matrix.arch }})
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - arch: arm64
-            runner: macos-14
-          - arch: x86_64
-            runner: macos-13
-    runs-on: ${{ matrix.runner }}
+    name: build (arm64)
+    runs-on: macos-14
     env:
       FFMPEG_VERSION: ${{ inputs.ffmpeg_version || '8.0.1' }}
+      ARCH: arm64
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -49,76 +49,26 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/Library/Caches/Homebrew
-          key: brew-${{ matrix.runner }}-v1
+          key: brew-macos-14-v1
 
       - name: Cache ffmpeg source tarball
         uses: actions/cache@v4
         with:
-          path: .work-macos-${{ matrix.arch }}/ffmpeg-${{ env.FFMPEG_VERSION }}.tar.gz
+          path: .work-macos-arm64/ffmpeg-${{ env.FFMPEG_VERSION }}.tar.gz
           key: ffmpeg-src-${{ env.FFMPEG_VERSION }}
 
       - name: Build ffmpeg
-        env:
-          ARCH: ${{ matrix.arch }}
         run: bash scripts/build-macos.sh
 
       - name: Smoke test
         run: |
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffmpeg  -version
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffprobe -version
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}/ffmpeg  -buildconf
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-arm64/ffmpeg  -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-arm64/ffprobe -version
+          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-arm64/ffmpeg  -buildconf
 
-      - name: Upload single-arch artifact
+      - name: Upload artifact
         uses: actions/upload-artifact@v4
-        with:
-          name: ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}
-          path: dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-${{ matrix.arch }}.tar.gz
-          retention-days: 14
-
-  universal:
-    name: lipo universal
-    needs: build
-    runs-on: macos-14
-    env:
-      FFMPEG_VERSION: ${{ inputs.ffmpeg_version || '8.0.1' }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Download arm64 artifact
-        uses: actions/download-artifact@v4
         with:
           name: ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-arm64
-          path: artifacts/arm64
-
-      - name: Download x86_64 artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-x86_64
-          path: artifacts/x86_64
-
-      - name: Extract single-arch binaries
-        run: |
-          mkdir -p extracted/arm64 extracted/x86_64
-          tar -xzf "artifacts/arm64/ffmpeg-${FFMPEG_VERSION}-darwin-arm64.tar.gz" -C extracted/arm64 --strip-components=1
-          tar -xzf "artifacts/x86_64/ffmpeg-${FFMPEG_VERSION}-darwin-x86_64.tar.gz" -C extracted/x86_64 --strip-components=1
-
-      - name: Lipo merge (handles every binary in the package — ffmpeg + ffprobe)
-        env:
-          ARM64_DIR: ${{ github.workspace }}/extracted/arm64
-          AMD64_DIR: ${{ github.workspace }}/extracted/x86_64
-        run: bash scripts/lipo-universal.sh
-
-      - name: Smoke test universal
-        run: |
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffmpeg  -version
-          ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffprobe -version
-          file ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffmpeg
-          file ./dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal/ffprobe
-
-      - name: Upload universal artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal
-          path: dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-universal.tar.gz
+          path: dist/ffmpeg-${{ env.FFMPEG_VERSION }}-darwin-arm64.tar.gz
           retention-days: 14
