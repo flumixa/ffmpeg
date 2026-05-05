@@ -32,7 +32,11 @@ PKG_NAME="ffmpeg-${FFMPEG_VERSION}-linux-${ARCH}"
 mkdir -p "$WORK" "$DIST/${PKG_NAME}"
 
 # ---------------------------------------------------------------------------
-# 1. Install build dependencies (Alpine .dev packages bring in static .a libs)
+# 1. Install build dependencies. Alpine ships .a archives in the *-dev
+#    packages for most libs, so we only need explicit *-static for the
+#    handful where a separate split exists (openssl/zlib/bzip2). If the
+#    final link complains about a missing .a, add the matching -static
+#    package here and re-run.
 # ---------------------------------------------------------------------------
 echo "==> Installing Alpine build dependencies"
 
@@ -61,25 +65,25 @@ apk add --no-cache \
   yasm \
   zlib-dev zlib-static \
   bzip2-dev bzip2-static \
-  freetype-dev freetype-static \
-  harfbuzz-dev harfbuzz-static \
-  libxml2-dev libxml2-static \
-  libsrt-dev libsrt-static \
-  x264-dev x264-static \
-  x265-dev x265-static \
+  freetype-dev \
+  harfbuzz-dev \
+  libxml2-dev \
+  libsrt-dev \
+  x264-dev \
+  x265-dev \
   libvpx-dev \
-  lame-dev lame-static \
+  lame-dev \
   opus-dev \
-  libvorbis-dev libvorbis-static \
-  libogg-dev libogg-static \
+  libvorbis-dev \
+  libogg-dev \
   fdk-aac-dev \
-  dav1d-dev dav1d-static \
+  dav1d-dev \
   aom-dev \
-  libxcb-dev libxcb-static \
-  brotli-dev brotli-static \
-  graphite2-dev graphite2-static \
+  libxcb-dev \
+  brotli-dev \
+  graphite2-dev \
   libpng-dev \
-  expat-dev expat-static \
+  expat-dev \
   pcre2-dev
 
 # ---------------------------------------------------------------------------
