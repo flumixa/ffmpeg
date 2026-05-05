@@ -116,16 +116,20 @@ cd "$SRC_DIR"
 
 # `-static` on extra-ldflags forces every link step (including the final
 # ffmpeg/ffprobe links) to resolve against .a archives, not .so. Combined
-# with musl, this produces self-contained binaries. The extra-libs list
-# pulls in transitive C/system dependencies that pkg-config sometimes
-# misses for static builds (notably the math/atomic/socket bits).
+# with musl, this produces self-contained binaries.
+#
+# We deliberately do NOT pass `--pkg-config-flags="--static"`: that flag
+# makes pkg-config recursively verify every static dep is installed, and
+# Alpine's heavier codec packages (aom, fdk-aac) ship .pc files that
+# reference deps not all present in *-dev. Without the flag pkg-config
+# returns plain -lfoo flags, and the explicit --extra-ldflags=-static +
+# --extra-libs below tell the linker to resolve those statically.
 ./configure \
   --prefix="${WORK}/install" \
   --extra-version="flumixa-${BUILD_COMMIT}-${BUILD_DATE}" \
-  --pkg-config-flags="--static" \
   --extra-cflags="-O2" \
   --extra-ldflags="-static" \
-  --extra-libs="-lpthread -lm -lz -ldl" \
+  --extra-libs="-lpthread -lxml2 -lm -lsupc++ -lstdc++ -lssl -lcrypto -lz -lc -ldl" \
   --enable-static \
   --disable-shared \
   --enable-gpl \
