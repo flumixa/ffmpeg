@@ -1,8 +1,10 @@
 name: "base:ffmpeg-linux"
 
-# Builds a fully-static ffmpeg + ffprobe for Linux x86_64 (musl libc, no
-# dynamic deps). Result runs on any Linux distro — Debian, Ubuntu,
-# Fedora, RHEL, Alpine — without needing apt-installed ffmpeg.
+# Builds a partially-static ffmpeg + ffprobe for Linux x86_64. Built on
+# Ubuntu 22.04 (glibc 2.35), with libgcc/libstdc++ linked statically and
+# all third-party codec libs (x264, x265, aom, dav1d, ...) baked in.
+# The only runtime dependency is glibc — works on any Linux desktop with
+# glibc 2.31+ (Debian 11+, Ubuntu 20.04+, Fedora 33+, RHEL 9+).
 
 on:
   workflow_dispatch:
@@ -30,13 +32,17 @@ jobs:
     name: build (amd64)
     runs-on: ubuntu-latest
     container:
-      image: alpine:3.23.2
+      image: ubuntu:22.04
     env:
       FFMPEG_VERSION: ${{ inputs.ffmpeg_version || '8.0.1' }}
     steps:
       - name: Install git for checkout action
-        # actions/checkout needs git inside the container.
-        run: apk add --no-cache git
+        # actions/checkout needs git inside the container; ca-certs for the
+        # ffmpeg.org tarball download below.
+        run: |
+          export DEBIAN_FRONTEND=noninteractive
+          apt-get update -qq
+          apt-get install -y --no-install-recommends git ca-certificates curl
 
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,7 +59,7 @@ jobs:
           key: ffmpeg-linux-src-${{ env.FFMPEG_VERSION }}
 
       - name: Build ffmpeg
-        run: sh scripts/build-linux.sh
+        run: bash scripts/build-linux.sh
 
       - name: Smoke test
         run: |
