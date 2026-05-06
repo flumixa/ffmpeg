@@ -137,6 +137,26 @@ echo "==> Packaging"
 strip ffmpeg ffprobe
 cp ffmpeg ffprobe "${DIST}/${PKG_NAME}/"
 
+# Bundle every Homebrew-linked dylib alongside the binary and rewrite the
+# binary's load commands to use @executable_path/lib/<name>. Without this
+# step the binaries reference paths like /opt/homebrew/opt/libxml2/lib/...
+# that don't exist on end-user machines (Homebrew itself usually doesn't
+# ship .a archives, so --enable-static doesn't make these libs static —
+# only ffmpeg's own modules become static). dylibbundler walks the dylib
+# graph recursively, so transitive dependencies are bundled too.
+echo "==> Bundling Homebrew dylibs via dylibbundler"
+brew list dylibbundler >/dev/null 2>&1 || brew install dylibbundler
+
+(
+  cd "${DIST}/${PKG_NAME}"
+  mkdir -p lib
+  # -od: overwrite existing files, -b: bundle libs, -of: rewrite paths in
+  # libs that already had them, -p: relative path the binary uses to find
+  # bundled libs at runtime.
+  dylibbundler -od -b -of -x ./ffmpeg  -d ./lib/ -p '@executable_path/lib/'
+  dylibbundler -od -b -of -x ./ffprobe -d ./lib/ -p '@executable_path/lib/'
+)
+
 # Print versioning info into the package for easy verification.
 "${DIST}/${PKG_NAME}/ffmpeg"  -version > "${DIST}/${PKG_NAME}/ffmpeg.version.txt"  2>&1 || true
 "${DIST}/${PKG_NAME}/ffprobe" -version > "${DIST}/${PKG_NAME}/ffprobe.version.txt" 2>&1 || true
