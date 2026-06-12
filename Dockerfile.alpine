@@ -77,6 +77,7 @@ RUN cd /dist/ffmpeg-${FFMPEG_VERSION} && \
   --enable-libv4l2 \
   --enable-v4l2_m2m \
   --enable-libfreetype \
+  --enable-libharfbuzz \
   --enable-alsa \
   --enable-libsrt \
   --enable-libx264 \
