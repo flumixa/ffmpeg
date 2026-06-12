@@ -16,6 +16,7 @@ Branch: 8.0
 ```sh
 --enable-libv4l2
 --enable-libfreetype
+--enable-libharfbuzz
 --enable-alsa
 --enable-libsrt
 --enable-libx264

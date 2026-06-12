@@ -108,6 +108,7 @@ LDFLAGS="-arch ${ARCH} -mmacosx-version-min=11.0 -L${BREW_PREFIX}/lib"
   --enable-openssl \
   --enable-libxml2 \
   --enable-libfreetype \
+  --enable-libharfbuzz \
   --enable-libsrt \
   --enable-libx264 \
   --enable-libx265 \

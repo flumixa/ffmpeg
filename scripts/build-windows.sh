@@ -50,6 +50,7 @@ PACMAN_PKGS=(
   mingw-w64-x86_64-fdk-aac
   mingw-w64-x86_64-srt
   mingw-w64-x86_64-freetype
+  mingw-w64-x86_64-harfbuzz
   mingw-w64-x86_64-openssl
   mingw-w64-x86_64-dav1d
   mingw-w64-x86_64-aom
@@ -102,6 +103,7 @@ cd "$SRC_DIR"
   --enable-openssl \
   --enable-libxml2 \
   --enable-libfreetype \
+  --enable-libharfbuzz \
   --enable-libsrt \
   --enable-libx264 \
   --enable-libx265 \

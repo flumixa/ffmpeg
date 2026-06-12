@@ -114,6 +114,7 @@ cd "$SRC_DIR"
   --enable-openssl \
   --enable-libxml2 \
   --enable-libfreetype \
+  --enable-libharfbuzz \
   --enable-libsrt \
   --enable-libx264 \
   --enable-libx265 \
