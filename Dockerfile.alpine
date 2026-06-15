@@ -106,6 +106,7 @@ COPY --from=builder /usr/bin/ffmpeg /usr/bin/ffmpeg
 COPY --from=builder /ffmpeg/lib/* /usr/lib/
 
 RUN apk add --no-cache \
+  ttf-dejavu \
   ca-certificates \
   libssl3 \
   tzdata \
