@@ -3,8 +3,8 @@ name: "base:ffmpeg-alpine"
 on:
   workflow_dispatch:
   push:
-    branches-ignore:
-      - "**"
+    tags:
+      - "v*"
 
 jobs:
   docker:
