@@ -121,7 +121,9 @@ ENV DEBIAN_FRONTEND=noninteractive
 RUN echo "/ffmpeglibs" > /etc/ld.so.conf.d/ffmpeg.conf && \
   ldconfig && \
   apt-get update && \
-  apt-get install -y ca-certificates openssl tzdata v4l-utils fbset libasound2-dev && \
+  apt-get install -y ca-certificates openssl tzdata v4l-utils fbset libasound2-dev fonts-dejavu-core && \
+  mkdir -p /usr/share/fonts/dejavu && \
+  ln -sf /usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf /usr/share/fonts/dejavu/DejaVuSans-Bold.ttf && \
   ffmpeg -buildconf
 
 ENV NVIDIA_VISIBLE_DEVICES=all
